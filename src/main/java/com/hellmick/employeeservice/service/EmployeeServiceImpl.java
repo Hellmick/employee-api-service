@@ -49,6 +49,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setSalary(dto.salary());
 
         Employee saved = employeeRepository.save(employee);
+        employeeRepository.flush();
         return toEmployeeResponseDto(saved);
     }
 
@@ -62,6 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setDepartment(dto.department());
         employee.setSalary(dto.salary());
         employee.setEmail(dto.email());
+        employeeRepository.flush();
 
         return toEmployeeResponseDto(employee);
     }

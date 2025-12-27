@@ -2,6 +2,7 @@ package com.hellmick.employeeservice.exception;
 
 import com.hellmick.employeeservice.dto.error.GlobalErrorResponseDto;
 import com.hellmick.employeeservice.exception.business.EmployeeNotFoundException;
+import com.hellmick.employeeservice.exception.business.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +21,35 @@ public class GlobalExceptionHandler {
             EmployeeNotFoundException ex,
             HttpServletRequest request) {
 
-        GlobalErrorResponseDto error = GlobalErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
-                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
+        GlobalErrorResponseDto error = new GlobalErrorResponseDto(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<GlobalErrorResponseDto> handleUserNotFound(
+            UserNotFoundException ex,
+            HttpServletRequest request) {
+
+        GlobalErrorResponseDto error = new GlobalErrorResponseDto(
+            LocalDateTime.now(),
+            HttpStatus.NOT_FOUND.value(),
+            HttpStatus.NOT_FOUND.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -42,13 +63,13 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        GlobalErrorResponseDto error = GlobalErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message(message)
-                .path(request.getRequestURI())
-                .build();
+        GlobalErrorResponseDto error = new GlobalErrorResponseDto(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                message,
+                request.getRequestURI()
+        );
 
         return ResponseEntity.badRequest().body(error);
     }
@@ -58,13 +79,13 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        GlobalErrorResponseDto error = GlobalErrorResponseDto.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message("Unexpected error occurred")
-                .path(request.getRequestURI())
-                .build();
+        GlobalErrorResponseDto error = new GlobalErrorResponseDto(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Unexpected error occurred",
+                request.getRequestURI()
+        );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

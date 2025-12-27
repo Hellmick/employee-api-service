@@ -27,9 +27,7 @@ public record EmployeeResponseDto(
     @Positive
     BigDecimal salary,
 
-    @NotBlank
     LocalDateTime created_at,
 
-    @NotBlank
     LocalDateTime updated_at
 ) {}
